@@ -54,6 +54,17 @@ function clearElements() {
 async function autocomplete(inputField) {
   const suggestions = await getPrompts()
 
+  const list = document.createElement('ul')
+  list.setAttribute('class', 'list')
+  list.style.position = 'absolute'
+  list.style.overflowY = 'auto'
+  list.style.bottom = '100%'
+  list.style.maxHeight = '200px'
+  list.style.width = '100%'
+  list.style.zIndex = '1'
+  list.style.background = '#40414F'
+  list.style.borderRadius = '6px'
+
   inputField.addEventListener('input', () => {
     clearElements()
 
@@ -68,23 +79,26 @@ async function autocomplete(inputField) {
       suggestion.act.toLowerCase().startsWith(value)
     )
 
-    const list = document.createElement('ul')
-    list.setAttribute('class', 'list')
-
     filteredSuggestions.forEach((suggestion) => {
       const listItem = document.createElement('li')
       listItem.classList.add('list-items')
       listItem.style.cursor = 'pointer'
-      listItem.innerHTML = suggestion.act
+      listItem.style.paddingLeft = '20px'
+
+      const pattern = new RegExp(`(${value})+`, 'gi')
+      listItem.innerHTML = suggestion.act.replace(pattern, '<b>$&</b>')
+
       listItem.addEventListener('click', () => {
         inputField.value = suggestion.prompt
+        inputField.style.height = inputField.scrollHeight + 'px'
+        inputField.focus()
         clearElements()
       })
 
       list.appendChild(listItem)
     })
 
-    inputField.parentNode.appendChild(list)
+    inputField.parentNode.parentNode.appendChild(list)
   })
 }
 
