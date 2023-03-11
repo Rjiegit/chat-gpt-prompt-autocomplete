@@ -1,0 +1,11 @@
+{
+  "name": "chat-gpt-prompt-autocomplete",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jie <mjunzh@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^2.8.4"
+  },
+  "dependencies": {}
+}
