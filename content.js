@@ -5,8 +5,6 @@ console.log('init chat gpt prompt autocomplete ...')
 // Get the input fields on the current page
 const inputField = document.querySelector('textarea')
 
-// 加上自訂 prompts 並修正 prompt 載入錯誤
-
 const customPrompts = [
   {
     act: 'Laravel developer',
