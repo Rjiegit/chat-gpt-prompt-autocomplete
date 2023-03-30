@@ -5,7 +5,27 @@ console.log('init chat gpt prompt autocomplete ...')
 // Get the input fields on the current page
 const inputField = document.querySelector('textarea')
 
-function getPrompts() {
+// 加上自訂 prompts 並修正 prompt 載入錯誤
+
+const customPrompts = [
+  {
+    act: 'Laravel developer',
+    prompt:
+      '請扮演一名資深 PHP 工程師，擅長使用 Laravel 框架進行開發。請協助我進行接下來的開發，並回覆我提出的問題。',
+  },
+  {
+    act: 'Typescript developer',
+    prompt:
+      '請扮演一名資深的 Node.JS 工程師，擅長使用 Typescript 進行開發，請協助我進行接下來的開發，並回覆我提出的問題。',
+  },
+  {
+    act: 'Git commit message generator',
+    prompt:
+      '請扮演一名資深軟體工程師，請針對以下問題，建議我 commit message，message 部分請用英文回覆。須包含以下要素：動詞開頭、簡潔描述。',
+  },
+]
+
+function getDefaultPrompts() {
   console.log('load prompts...')
   // https://github.com/f/awesome-chatgpt-prompts
   return new Promise(function (resolve, reject) {
@@ -18,10 +38,12 @@ function getPrompts() {
 
     xhr.onload = function () {
       if (this.readyState === 4 && this.status === 200) {
-        let lines = xhr.responseText.split('\n')
+        const lines = xhr.responseText.split('\n')
         let result = []
-        let headers = lines[0].split(',')
-        for (let i = 1; i < lines.length; i++) {
+        const headers = lines[0].split(',')
+        const lineLength = lines[lines.length - 1] === '' ? lines.length - 1 : lines.length
+
+        for (let i = 1; i < lineLength; i++) {
           let obj = {}
           let currentline = lines[i].split(',"')
           for (let j = 0; j < headers.length; j++) {
@@ -52,7 +74,7 @@ function clearElements() {
 
 // Define the autocomplete function
 async function autocomplete(inputField) {
-  const suggestions = await getPrompts()
+  const suggestions = (await getDefaultPrompts()).concat(customPrompts)
 
   const list = document.createElement('ul')
   list.setAttribute('class', 'list')
@@ -75,9 +97,12 @@ async function autocomplete(inputField) {
     }
 
     // Filter the suggestions based on the current input value
-    const filteredSuggestions = suggestions.filter((suggestion) =>
-      suggestion.act.toLowerCase().startsWith(value)
-    )
+    const filteredSuggestions = suggestions
+      .map((suggestion) => {
+        suggestion.act = suggestion.act.startsWith('/') ? suggestion.act : '/' + suggestion.act
+        return suggestion
+      })
+      .filter((suggestion) => suggestion.act.toLowerCase().startsWith(value))
 
     filteredSuggestions.forEach((suggestion) => {
       const listItem = document.createElement('li')
